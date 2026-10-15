@@ -95,7 +95,7 @@ export const MarketComparisonModal: React.FC<MarketComparisonModalProps> = ({
             </div>
           ) : comparison ? (
             <>
-              {comparison.comparison.map((item, idx) => (
+              {(Array.isArray(comparison?.comparison) ? comparison.comparison : []).map((item, idx) => (
                 <div
                   key={idx}
                   className={`p-4 rounded-2xl border transition relative ${

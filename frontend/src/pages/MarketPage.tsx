@@ -179,7 +179,7 @@ export const MarketPage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-7 gap-2.5">
-              {history.history.map((pt, idx) => (
+              {(Array.isArray(history?.history) ? history.history : []).map((pt, idx) => (
                 <div key={idx} className="p-3 bg-surface-subtle border border-slate-200/80 rounded-2xl text-center hover:border-botanical-300 transition">
                   <span className="text-[11px] font-bold text-slate-500 block">{pt.date}</span>
                   <span className="text-sm font-black text-forest-800 mt-1 block">₹{pt.modal_price}</span>

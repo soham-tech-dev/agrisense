@@ -43,7 +43,7 @@ export const MandiPricesWidget: React.FC<MandiPricesWidgetProps> = ({
       }
     >
       <div className="space-y-3">
-        {prices.length > 0 ? (
+        {Array.isArray(prices) && prices.length > 0 ? (
           prices.map((item, idx) => (
             <div
               key={idx}

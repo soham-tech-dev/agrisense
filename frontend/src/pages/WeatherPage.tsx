@@ -114,7 +114,7 @@ export const WeatherPage: React.FC = () => {
         badge={<Badge variant="info">{isMarathi ? 'दैनिक अंदाज' : 'Daily Trend'}</Badge>}
       >
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-1">
-          {forecast?.forecast.map((fc, idx) => (
+          {(Array.isArray(forecast?.forecast) ? forecast.forecast : []).map((fc, idx) => (
             <div
               key={idx}
               className="p-4 rounded-2xl bg-surface-subtle border border-slate-200/80 text-center space-y-2.5 hover:border-botanical-300 hover:shadow-xs transition"

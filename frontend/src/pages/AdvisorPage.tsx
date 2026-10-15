@@ -337,7 +337,7 @@ export const AdvisorPage: React.FC = () => {
               {t('advisor.noConversations', 'No conversations yet. Ask a question!')}
             </div>
           ) : (
-            conversations.map((c) => {
+            (Array.isArray(conversations) ? conversations : []).map((c) => {
               const isActive = activeConversationId === c.id;
               return (
                 <div
@@ -481,7 +481,7 @@ export const AdvisorPage: React.FC = () => {
                   {t('advisor.suggestedTitle', isMarathi ? 'काही विचारलेले प्रश्न:' : 'Suggested Questions:')}
                 </div>
                 <div className="flex flex-col gap-2">
-                  {suggestedQuestions.map((q, idx) => (
+                  {(Array.isArray(suggestedQuestions) ? suggestedQuestions : []).map((q, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSend(q, false)}
@@ -495,7 +495,7 @@ export const AdvisorPage: React.FC = () => {
               </div>
             </div>
           ) : (
-            messages.map((msg) => {
+            (Array.isArray(messages) ? messages : []).map((msg) => {
               const isUser = msg.role === 'user';
               const isPlayingThis = playingMessageId === msg.id;
 
@@ -782,10 +782,10 @@ export const AdvisorPage: React.FC = () => {
               {/* EXISTING DOCUMENTS LIST */}
               <div className="space-y-3">
                 <h4 className="text-sm font-bold text-slate-800">Indexed KVK Documents</h4>
-                {knowledgeDocs.length === 0 ? (
+                {!Array.isArray(knowledgeDocs) || knowledgeDocs.length === 0 ? (
                   <div className="text-slate-500 text-xs text-center py-4">No documents found.</div>
                 ) : (
-                  knowledgeDocs.map((doc) => (
+                  (Array.isArray(knowledgeDocs) ? knowledgeDocs : []).map((doc) => (
                     <div
                       key={doc.id}
                       className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between text-xs"
