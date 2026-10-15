@@ -12,6 +12,7 @@ router = APIRouter()
 START_TIME = time.time()
 
 @router.get("/health", tags=["Health Check"])
+@router.get("/healthz", tags=["Health Check"])
 def health_check(db: Session = Depends(get_db)):
     """
     Production health check endpoint verifying core subsystem availability:
