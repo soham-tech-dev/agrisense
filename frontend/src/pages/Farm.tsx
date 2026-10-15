@@ -71,14 +71,11 @@ export const Farm: React.FC = () => {
     setSavingFarm(true);
     try {
       if (farms.length > 0) {
-        const updated = await fetch(`/api/v1/farms/me/${farms[0].id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('agrisense_token')}`
-          },
-          body: JSON.stringify({ land_size: landSize, ownership_type: ownershipType, location })
-        }).then(res => res.json());
+        const updated = await api.updateFarm(farms[0].id, {
+          land_size: landSize,
+          ownership_type: ownershipType,
+          location
+        });
         setFarms([updated]);
       } else {
         const created = await api.createFarm({ land_size: landSize, ownership_type: ownershipType, location });

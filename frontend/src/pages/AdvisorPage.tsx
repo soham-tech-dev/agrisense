@@ -98,27 +98,30 @@ export const AdvisorPage: React.FC = () => {
   const loadConversations = async () => {
     try {
       const data = await chatService.getConversations();
-      setConversations(data);
+      setConversations(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to load conversations:', err);
+      setConversations([]);
     }
   };
 
   const loadConversationMessages = async (id: string) => {
     try {
       const data = await chatService.getConversationDetail(id);
-      setMessages(data.messages || []);
+      setMessages(Array.isArray(data?.messages) ? data.messages : []);
     } catch (err) {
       console.error('Failed to load messages:', err);
+      setMessages([]);
     }
   };
 
   const loadKnowledgeDocs = async () => {
     try {
       const docs = await chatService.getKnowledgeDocs();
-      setKnowledgeDocs(docs);
+      setKnowledgeDocs(Array.isArray(docs) ? docs : []);
     } catch (err) {
       console.error('Failed to load knowledge documents:', err);
+      setKnowledgeDocs([]);
     }
   };
 
@@ -329,7 +332,7 @@ export const AdvisorPage: React.FC = () => {
           <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider px-3 py-1.5">
             {t('advisor.conversations', 'Past Conversations')}
           </div>
-          {conversations.length === 0 ? (
+          {!Array.isArray(conversations) || conversations.length === 0 ? (
             <div className="text-xs text-emerald-300/70 px-3 py-4 text-center">
               {t('advisor.noConversations', 'No conversations yet. Ask a question!')}
             </div>
@@ -444,7 +447,7 @@ export const AdvisorPage: React.FC = () => {
 
         {/* MESSAGES CONTAINER */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
-          {messages.length === 0 ? (
+          {!Array.isArray(messages) || messages.length === 0 ? (
             <div className="max-w-xl mx-auto my-auto text-center space-y-6 pt-4">
               
               {/* Welcoming Voice Card Banner */}
@@ -562,14 +565,14 @@ export const AdvisorPage: React.FC = () => {
                             onClick={() => toggleSources(msg.id)}
                             className="text-slate-500 hover:text-slate-800 flex items-center gap-1 text-[11px] bg-slate-100 px-2 py-1 rounded-lg"
                           >
-                            <span>{msg.sources.length} {isMarathi ? 'स्रोत' : 'Sources'}</span>
+                            <span>{Array.isArray(msg.sources) ? msg.sources.length : 0} {isMarathi ? 'स्रोत' : 'Sources'}</span>
                             {expandedSources[msg.id] ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                           </button>
                         </div>
 
                         {expandedSources[msg.id] && (
                           <div className="mt-2 space-y-2">
-                            {msg.sources.map((src, sIdx) => (
+                            {(Array.isArray(msg.sources) ? msg.sources : []).map((src, sIdx) => (
                               <div
                                 key={sIdx}
                                 className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1"
