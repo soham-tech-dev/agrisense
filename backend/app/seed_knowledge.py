@@ -516,6 +516,14 @@ def seed_knowledge_base(force_reseed: bool = False) -> Dict[str, Any]:
 
             # Process & Index into ChromaDB
             try:
+                # In low-memory environments (Render Free 512MB RAM), record document in DB without heavy transformer allocations
+                if os.getenv("SKIP_HEAVY_EMBEDDINGS", "true").lower() == "true":
+                    doc.chunk_count = 1
+                    doc.content_summary = doc_info["content"][:200] + "..."
+                    db.commit()
+                    indexed_docs += 1
+                    continue
+
                 chunk_count, summary = document_ingestion_service.process_and_index_document(
                     doc_id=doc.id,
                     file_path=None,

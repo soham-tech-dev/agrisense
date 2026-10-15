@@ -13,3 +13,5 @@ services:
         value: AgriSense
       - key: CORS_ORIGINS
         value: "*"
+      - key: SKIP_HEAVY_EMBEDDINGS
+        value: "true"
