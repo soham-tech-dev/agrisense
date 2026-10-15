@@ -1,7 +1,7 @@
 import os
 import re
 import logging
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from app.services.vector_store import vector_store_service
 
 logger = logging.getLogger(__name__)
