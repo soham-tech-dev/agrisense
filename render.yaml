@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: agrisense
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: PROJECT_NAME
+        value: AgriSense
+      - key: CORS_ORIGINS
+        value: "*"
