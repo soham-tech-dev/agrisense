@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: agrisense_database
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-agrisense_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-agrisense_password}
+      POSTGRES_DB: ${POSTGRES_DB:-agrisense_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agrisense_user} -d ${POSTGRES_DB:-agrisense_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  vectordb:
+    image: chromadb/chroma:0.5.5
+    container_name: agrisense_vectordb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: agrisense_backend
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER:-agrisense_user}:${POSTGRES_PASSWORD:-agrisense_password}@database:5432/${POSTGRES_DB:-agrisense_db}
+      - CHROMA_DB_DIR=/app/chroma_db
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY:-}
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY:-}
+      - DATA_GOV_IN_API_KEY=${DATA_GOV_IN_API_KEY:-}
+      - SECRET_KEY=${SECRET_KEY:-agrisense_production_jwt_secret_key_change_me_32bytes}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend_static:/app/static
+      - backend_chroma:/app/chroma_db
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: agrisense_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  postgres_data:
+  chroma_data:
+  backend_static:
+  backend_chroma:

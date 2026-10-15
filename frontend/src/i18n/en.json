@@ -1,0 +1,141 @@
+{
+  "app": {
+    "name": "AgriSense",
+    "tagline": "AgriSense Digital Farmer Partner",
+    "subtitle": "KVK & ICAR Grounded Agricultural Intelligence"
+  },
+  "nav": {
+    "dashboard": "Home",
+    "disease": "Crop Health",
+    "advisor": "Ask AgriSense",
+    "weather": "Weather",
+    "market": "Market Prices",
+    "farm": "My Farm",
+    "profile": "Profile",
+    "settings": "Settings",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "common": {
+    "marathi": "Marathi",
+    "english": "English",
+    "switchLanguage": "Change Language",
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "close": "Close",
+    "submit": "Submit",
+    "active": "Active",
+    "none": "None",
+    "all": "All",
+    "crop": "Crop",
+    "allCrops": "All Crops",
+    "groundedSource": "Verified KVK Source",
+    "safetyFallback": "KVK Safety Fallback"
+  },
+  "voice": {
+    "title": "ASK AGRISENSE",
+    "subtitle": "Tap microphone and speak your question",
+    "listening": "Listening...",
+    "processing": "Processing your speech...",
+    "speaking": "Reading answer aloud...",
+    "playAnswer": "Play Answer",
+    "stopSpeaking": "Stop Audio",
+    "tapToSpeak": "Tap to speak",
+    "speakPrompt": "e.g. 'My onion crop has dark purple spots'",
+    "status": {
+      "idle": "Ready for voice input",
+      "listening": "Listening to your voice...",
+      "processing": "Searching verified KVK advisory...",
+      "speaking": "Audio playback active",
+      "error": "Voice error occurred"
+    },
+    "errors": {
+      "permission_denied": "Microphone permission denied. Please allow microphone access in browser settings.",
+      "unsupported_browser": "Voice recognition is not supported in this browser. Please use Chrome or Edge, or type your question below.",
+      "network_error": "Network connection error during speech recognition. Please check connection and try again.",
+      "no_speech": "No speech detected. Please tap the microphone and try speaking again.",
+      "audio_capture": "Microphone hardware not found. Please connect a microphone or check device settings.",
+      "not_allowed": "Microphone permission denied. Please allow microphone access in browser settings.",
+      "unknown": "An unexpected voice error occurred. Please try again or type your question."
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "greeting": "Namaskar Farmer Brother!",
+    "weatherWidgetTitle": "Local Weather Forecast",
+    "temp": "Temperature",
+    "humidity": "Humidity",
+    "rainProb": "Rain Probability",
+    "marketWidgetTitle": "Today's Mandi Prices",
+    "cropHealthTitle": "Instant Crop Disease Scan",
+    "quickAskTitle": "Ask Agricultural AI Advisor",
+    "recentHistory": "Recent Activity",
+    "viewDetails": "View Details"
+  },
+  "advisor": {
+    "title": "AgriSense AI Agricultural Advisor",
+    "subTitle": "Grounded strictly in verified KVK & ICAR documents",
+    "newChat": "New Chat",
+    "conversations": "Your Conversations",
+    "noConversations": "No past conversations. Ask a question to start!",
+    "suggestedTitle": "Suggested Questions",
+    "suggested1": "Will it rain today in my village?",
+    "suggested2": "My onion leaves have purple spots and yellowing. What should I do?",
+    "suggested3": "What is today's onion market price in APMC Nashik?",
+    "suggested4": "How to manage drip irrigation for sugarcane?",
+    "inputPlaceholder": "Ask agricultural question (or tap microphone)...",
+    "knowledgeBase": "KVK Knowledge Base",
+    "sourcesTitle": "Verified Sources",
+    "helpful": "Helpful",
+    "notHelpful": "Needs Improvement"
+  },
+  "disease": {
+    "title": "Crop Health & Disease Scanner",
+    "subTitle": "Upload or take photo of affected leaf for KVK-verified diagnosis",
+    "uploadPrompt": "Tap to upload or take a leaf photo",
+    "supportedFormats": "PNG, JPG up to 10MB",
+    "analyzing": "Analyzing leaf image with AI & KVK database...",
+    "selectCrop": "Select Affected Crop",
+    "history": "Scan History",
+    "noHistory": "No previous disease scans found."
+  },
+  "weather": {
+    "title": "Agricultural Weather Advisory",
+    "subTitle": "Hyperlocal 7-day forecast & farming recommendations",
+    "today": "Today",
+    "forecast": "7-Day Weather Forecast",
+    "sprayAdvisory": "Spraying Recommendation",
+    "irrigationAdvisory": "Irrigation Recommendation",
+    "wind": "Wind Speed"
+  },
+  "market": {
+    "title": "APMC Mandi Market Prices",
+    "subTitle": "Daily wholesale commodity rates & trends across Maharashtra",
+    "commodity": "Commodity",
+    "mandi": "Market (APMC)",
+    "minPrice": "Min Rate (₹/Qtl)",
+    "maxPrice": "Max Rate (₹/Qtl)",
+    "modalPrice": "Modal Price (₹/Qtl)",
+    "trend": "Trend"
+  },
+  "farm": {
+    "title": "My Farm Profile",
+    "subTitle": "Manage crop land, soil type, and active crops",
+    "addFarm": "Add New Field",
+    "totalArea": "Total Land Area",
+    "soilType": "Soil Type",
+    "irrigationSource": "Irrigation Source"
+  },
+  "settings": {
+    "title": "App Settings & Preferences",
+    "subTitle": "Configure language, voice assistant, and notifications",
+    "languageSection": "Language Preference",
+    "voiceSection": "Voice Assistant Settings",
+    "autoTTS": "Auto-play Voice Answer (TTS)",
+    "autoTTSSub": "Automatically read out AI advisor responses aloud"
+  }
+}

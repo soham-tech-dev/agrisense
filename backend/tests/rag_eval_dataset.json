@@ -1,0 +1,54 @@
+[
+  {
+    "id": "eval_001",
+    "category": "retrieval_relevance",
+    "language": "mr",
+    "query": "कांद्यावरील जांभळा करपा कसा ओळखावा आणि त्यावर काय उपाय करावा?",
+    "expected_intent": "DISEASE",
+    "expected_grounded": true,
+    "expected_sources_contain": ["KVK Narayangaon (Pune)"]
+  },
+  {
+    "id": "eval_002",
+    "category": "source_correctness",
+    "language": "en",
+    "query": "What fungicide is recommended by ICAR for tomato early blight?",
+    "expected_intent": "DISEASE",
+    "expected_grounded": true,
+    "expected_sources_contain font": ["ICAR Indian Institute of Horticultural Research"]
+  },
+  {
+    "id": "eval_003",
+    "category": "weather_irrigation",
+    "language": "en",
+    "query": "Will it rain today and should I irrigate my crop?",
+    "expected_intent": "WEATHER",
+    "expected_grounded": true
+  },
+  {
+    "id": "eval_004",
+    "category": "mandi_price",
+    "language": "mr",
+    "query": "आजचा कांद्याचा बाजारभाव काय आहे?",
+    "expected_intent": "MANDI",
+    "expected_grounded": true
+  },
+  {
+    "id": "eval_005",
+    "category": "hallucination_fallback",
+    "language": "en",
+    "query": "What is the quantum chemical synthesis formula for QuantumPestX chemical compound?",
+    "expected_intent": "UNKNOWN",
+    "expected_grounded": false,
+    "expected_fallback": "I couldn't find enough verified information for this question in the available agricultural knowledge sources. Please consult your local KVK/agricultural officer."
+  },
+  {
+    "id": "eval_006",
+    "category": "unsupported_marathi",
+    "language": "mr",
+    "query": "लॅपटॉप कसा दुरुस्त करावा?",
+    "expected_intent": "UNKNOWN",
+    "expected_grounded": false,
+    "expected_fallback": "मला उपलब्ध कृषी ज्ञान स्रोतांमध्ये या प्रश्नासाठी पुरेशी पडताळलेली माहिती सापडली नाही. कृपया तुमच्या स्थानिक केव्हीके (KVK) / कृषी अधिकाऱ्यांचा सल्ला घ्या."
+  }
+]

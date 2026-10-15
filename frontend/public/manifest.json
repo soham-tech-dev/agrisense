@@ -1,0 +1,16 @@
+{
+  "short_name": "AgriSense",
+  "name": "AgriSense - Smart Farming AI Advisor",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#064e3b",
+  "theme_color": "#059669",
+  "display": "standalone",
+  "orientation": "portrait"
+}

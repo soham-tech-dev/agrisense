@@ -1,0 +1,82 @@
+# Node & Frontend dependencies
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python & Virtual Environments
+.venv/
+**/venv/
+**/env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python caches and bytecode
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Environment Variables & Secrets (CRITICAL)
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*serviceAccount*.json
+*service-account*.json
+*firebase-adminsdk*.json
+
+# Databases & Vector Stores
+*.db
+*.sqlite
+*.sqlite3
+agrisense_dev.db
+chroma_db/
+**/chroma_db/
+
+# Build & Distribution artifacts
+dist/
+**/dist/
+build/
+**/build/
+out/
+.next/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Static user-uploaded scan images (keep directory structure)
+backend/static/scans/*
+!backend/static/scans/.gitkeep
+static/scans/*
+!static/scans/.gitkeep
+
+# Temporary / Log files
+*.log
+logs/
+temp/
+tmp/
