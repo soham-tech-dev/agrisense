@@ -3,7 +3,10 @@ import logging
 from typing import Optional
 import numpy as np
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
-import speech_recognition as sr
+try:
+    import speech_recognition as sr
+except ImportError:
+    sr = None
 
 logger = logging.getLogger("app.api.voice")
 router = APIRouter()
@@ -18,6 +21,9 @@ async def transcribe_audio(
     Accepts standard PCM WAV audio files and performs accurate speech-to-text.
     """
     try:
+        if sr is None:
+            return {"success": False, "transcript": "", "error": "SpeechRecognition library not installed on server"}
+
         content = await file.read()
         if not content or len(content) < 100:
             return {"success": False, "transcript": "", "error": "Empty audio"}
