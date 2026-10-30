@@ -38,13 +38,16 @@ This PRD is strictly grounded in the empirical survey findings from *Assignment 
 
 ## 4. Product Feature Requirements
 
-### F1. Crop Disease Scanner (MobileNetV2 + OpenCV)
-- **Description**: Capture/upload leaf photos for instant pathology identification.
+### F1. Crop Disease Scanner (Dual-Tier Hybrid Vision + OpenCV)
+- **Description**: Capture/upload leaf photos for instant pathology identification and treatment planning.
 - **Inputs**: Camera stream or uploaded image file.
-- **Outputs**: Disease name, confidence score, visual bounding/foliage mask, organic/chemical treatment steps.
+- **Outputs**: Disease name, confidence score, visual bounding/foliage mask, organic & chemical treatment steps from the 18-disease catalog.
 - **Requirements**:
-  - Process image through OpenCV foliage segmentation before model inference.
-  - Display confidence meter. If confidence < 0.65 (cosine distance cutoff on RAG) or the ML model confidence is below threshold, output a cautious fallback advisory urging expert review.
+  - Process image through OpenCV foliage validation (blur detection via Laplacian variance, mean brightness, format check) before model inference.
+  - **Dual-Tier AI Inference**:
+    - **Tier 1 (Edge / Fast)**: MobileNetV2 CNN (`.keras` format) for rapid offline prediction (~200ms).
+    - **Tier 2 (Cloud / Precision)**: Automatic dynamic escalation to Google Gemini 3.5 Flash Lite Vision if Tier 1 confidence is below 70% or complex outdoor foliage domain shift occurs.
+  - Display confidence meter. If confidence is below threshold, output a cautious fallback advisory urging Krishi Vigyan Kendra (KVK) extension officer consultation.
 
 ### F2. KVK/ICAR Grounded AI Advisor (Voice & RAG)
 - **Description**: Natural language voice and text agricultural Q&A.

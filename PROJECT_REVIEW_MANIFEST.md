@@ -11,7 +11,7 @@
 
 **AgriSense** is an AI-powered agricultural decision-support and advisory system designed specifically for smallholder farmers in Maharashtra, India. The platform bridges the digital and linguistic divide by providing:
 
-1. **Crop Disease Diagnosis**: Computer vision diagnosis using MobileNetV2 transfer learning with OpenCV foliage validation and threshold gating.
+1. **Crop Disease Diagnosis**: Dual-tier hybrid vision diagnosis combining local MobileNetV2 CNN (`.keras` / `.h5`) with automatic escalation to Google Gemini 3.5 Flash Lite Vision AI, OpenCV foliage validation, and an 18-disease clinical advisory catalog.
 2. **KVK / ICAR-Grounded AI Advisory**: Retrieval-Augmented Generation (RAG) powered by ChromaDB vector search and Anthropic Claude 3.5 Sonnet, with strict safety fallback barriers to prevent hallucination.
 3. **Voice-First Vernacular Interaction**: Full bilingual Marathi (`mr`) and English (`en`) interface supporting Web Speech STT (Speech-to-Text) and TTS (Text-to-Speech).
 4. **Agro-Climatic Intelligence**: Live weather tracking and 5-day forecasts via OpenWeatherMap with rule-based pesticide/spraying advisories.
@@ -66,7 +66,7 @@ AgriSense_Review_Package/
 │   │   ├── schemas/                   # Pydantic validation schemas
 │   │   └── services/
 │   │       ├── cache_service.py       # In-memory TTL cache with thread lock
-│   │       ├── disease_ml_service.py  # MobileNetV2 inference & Mock fallback adapter
+│   │       ├── disease_ml_service.py  # Hybrid 3-tier: MobileNetV2 CNN, Gemini 3.5 Vision & Mock fallback
 │   │       ├── document_ingestion.py  # PDF text extraction & sentence-aware chunking
 │   │       ├── image_validation_service.py # OpenCV foliage detection & blur check
 │   │       ├── intent_detector.py     # Marathi & English regex intent classifier
@@ -128,7 +128,7 @@ AgriSense_Review_Package/
 | **Database & ORM** | PostgreSQL 15 / SQLite fallback, SQLAlchemy 2.0 | Multi-tenant schema with relational foreign keys |
 | **Vector Store & Embeddings** | ChromaDB 0.5+, `sentence-transformers` (`all-MiniLM-L6-v2`) | Persistent vector database using HNSW cosine index |
 | **LLM & RAG** | Anthropic Claude 3.5 Sonnet API (`claude-3-5-sonnet-20241022`) | Context-grounded synthesis with safety fallback bounds |
-| **Computer Vision / ML** | OpenCV (`opencv-python-headless`), MobileNetV2, PIL | Foliage segmentation, blur gating, CNN classification |
+| **Computer Vision / ML** | OpenCV, MobileNetV2 (`.keras` / `.h5`), Google Gemini 3.5 Flash Lite Vision | Foliage segmentation, blur gating, dual-tier CNN/Cloud disease inference |
 | **Voice / Speech** | Web Speech API (STT & TTS), pluggable adapter layer | Low-latency client-side browser speech recognition |
 | **Containerization** | Docker, Docker Compose, Nginx | Multi-stage Docker builds for production deployment |
 
