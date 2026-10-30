@@ -126,7 +126,7 @@ async def predict_crop_disease(
     
     image_url = f"/static/scans/{unique_filename}"
 
-    # 4. Execute ML Inference
+    # 4. Execute ML Inference (Hybrid: Tier1=Local CNN / Tier2=Gemini / Tier3=Mock)
     ml_service = DiseaseMLService()
     inference_result = ml_service.predict(img_bytes=contents, img_bgr=img_bgr)
 
@@ -135,11 +135,27 @@ async def predict_crop_disease(
     model_version = inference_result["model_version"]
     is_low_confidence = inference_result["is_low_confidence"]
     warning = inference_result["warning"]
+    gemini_detail = inference_result.get("gemini_detail")  # Rich detail from Gemini (None for Tier 1/3)
 
-    # 5. Lookup catalog info
+    # 5. Lookup catalog info — if Gemini returned a disease not in catalog, build dynamic entry
     disease_info = db.query(DiseaseCatalog).filter(DiseaseCatalog.id == pred_label).first()
+    if not disease_info and gemini_detail and not gemini_detail.get("is_healthy"):
+        # Dynamically create a catalog entry from Gemini's rich response (not persisted — session only)
+        disease_info = DiseaseCatalog(
+            id=pred_label,
+            crop=gemini_detail.get("crop", "Unknown"),
+            name_en=gemini_detail.get("disease_name", pred_label.replace("_", " ").title()),
+            name_mr=gemini_detail.get("disease_name", pred_label.replace("_", " ").title()),
+            symptoms_en=". ".join(gemini_detail.get("symptoms", [])),
+            symptoms_mr=". ".join(gemini_detail.get("symptoms", [])),
+            advisory_en=f"{gemini_detail.get('chemical_treatment', '')}",
+            advisory_mr=f"{gemini_detail.get('organic_treatment', '')}",
+            prevention_en=gemini_detail.get("prevention", "Consult your local KVK officer."),
+            prevention_mr=gemini_detail.get("prevention", "स्थानिक KVK अधिकाऱ्यांचा सल्ला घ्या."),
+            source="Gemini Vision AI (ICAR/KVK grounded)",
+            active=True
+        )
     if not disease_info:
-        # Fallback to first catalog entry if specific ID isn't mapped
         disease_info = db.query(DiseaseCatalog).first()
 
     # 6. Save Scan into database persistence table disease_scans

@@ -44,7 +44,7 @@ This PRD is strictly grounded in the empirical survey findings from *Assignment 
 - **Outputs**: Disease name, confidence score, visual bounding/foliage mask, organic/chemical treatment steps.
 - **Requirements**:
   - Process image through OpenCV foliage segmentation before model inference.
-  - Display confidence meter. If confidence < 0.70, output a cautious fallback advisory urging expert review.
+  - Display confidence meter. If confidence < 0.65 (cosine distance cutoff on RAG) or the ML model confidence is below threshold, output a cautious fallback advisory urging expert review.
 
 ### F2. KVK/ICAR Grounded AI Advisor (Voice & RAG)
 - **Description**: Natural language voice and text agricultural Q&A.
@@ -98,7 +98,7 @@ This PRD is strictly grounded in the empirical survey findings from *Assignment 
 - **Performance**: MobileNetV2 disease classification response time ≤ 1.5 seconds; RAG advisory response time ≤ 3.5 seconds.
 - **Accessibility**: Tap target minimum size 48x48px; high contrast colors for daylight outdoor readability.
 - **Localization**: Dual language support (`mr` Marathi and `en` English) with 100% UI translation coverage.
-- **Security & Privacy**: Jwt-based farmer authentication, HTTPS encryption, privacy-compliant handling of photos and location data.
+- **Security & Privacy**: JWT-based farmer authentication, HTTPS encryption, privacy-compliant handling of photos and location data.
 - **Reliability**: Graceful degrading when offline with clear user feedback.
 
 ---
@@ -107,13 +107,10 @@ This PRD is strictly grounded in the empirical survey findings from *Assignment 
 
 The following parameters are deliberately configured as placeholders to allow modular adaptation:
 
-```typescript
-// Configurable Placeholders
-export const SYSTEM_CONFIG = {
-  DISEASE_CLASSES: 'configurable', // Placeholder array for pathology models
-  KNOWLEDGE_SOURCES: 'configurable', // Vector DB collection identifiers
-  VOICE_PROVIDER: 'configurable', // Web Speech API / Cloud STT provider
-  MANDI_MARKETS: 'configurable', // List of monitored APMC markets
-  PRODUCTION_HOSTING_PROVIDER: 'configurable' // Cloud deployment target
-};
-```
+| Parameter | Current Value | Notes |
+|---|---|---|
+| `DISEASE_CLASSES` | `tomato_early_blight`, `tomato_late_blight`, `cotton_bacterial_blight` | Extend by retraining MobileNetV2 |
+| `KNOWLEDGE_SOURCES` | 18 pre-seeded KVK/ICAR documents in ChromaDB | Upload more via Admin Portal |
+| `VOICE_PROVIDER` | `web_speech_api` | Configurable via `VITE_VOICE_PROVIDER` env var |
+| `MANDI_MARKETS` | Lasalgaon, Pimpalgaon, Nashik, Pune, Solapur | Extend in `mandi_service.py` |
+| `PRODUCTION_HOSTING_PROVIDER` | Render (backend) + Vercel (frontend) | Configured via `render.yaml` & `vercel.json` |

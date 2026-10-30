@@ -3,8 +3,8 @@
 ## 1. Current Project Analysis
 
 ### Repository & Workspace Status
-- **Workspace Location**: `c:\Users\yashs\OneDrive\Desktop\Agrisense`
-- **Current State**: Fresh repository setup (Phase 0). No pre-existing legacy code or conflicting frameworks.
+- **Workspace Location**: `d:\website\CEP\Agrisense 1(2)\Agrisense 1(2)\Agrisense 1`
+- **Current State**: Fully implemented across Phase 0–8. All 52 automated tests passing.
 - **Primary Source Documents**:
   1. *Assignment 1 — Needs Assessment*
   2. *Assignment 2 — Project Proposal*
@@ -71,17 +71,27 @@ graph TD
 src/
 ├── assets/             # Icons, logos, static illustrations
 ├── components/
-│   ├── common/         # Button, Card, Modal, Navbar, VoiceMicButton, LanguageToggle
-│   ├── disease/        # ImageUploader, CameraCapture, ScanResultCard, ConfidenceMeter
-│   ├── advisor/        # ChatWindow, VoiceMessageBubble, SourcesBadge, FeedbackButtons
-│   ├── weather/        # WeatherWidget, AgrometAdvisoryCard, ForecastCarousel
-│   ├── mandi/          # CommodityPriceCard, MarketSelector, PriceTrendChart
-│   └── profile/        # FarmerForm, CropList, LandDetails
-├── context/            # AuthContext, LanguageContext, OfflineContext
-├── hooks/              # useVoiceRecognition, useCamera, usePWA, useAgriApi
-├── services/           # api.ts, storage.ts, voice.ts, offlineQueue.ts
-├── i18n/               # index.ts, locales/ (en.json, mr.json)
-└── pages/              # Home, DiseaseScanner, Advisory, Weather, Mandi, Profile, Admin
+│   ├── common/         # Button, Card, Modal, Input, Select, Badge, Toast,
+│   │                   # LanguageToggle, OfflineBanner, FirebaseErrorBoundary,
+│   │                   # EmptyState, ErrorState, LoadingState, FeedbackWidget
+│   ├── layout/         # AppShell, Header, Sidebar, TopNav, DesktopNav, MobileNav, AdminLayout
+│   ├── dashboard/      # DashboardAlerts, DiseaseHistoryModal
+│   ├── disease/        # (Disease scan UI within DiseasePage & DiseaseResultPage)
+│   ├── advisor/        # (Voice & chat UI within AdvisorPage)
+│   ├── weather/        # WeatherWidget, WeatherAdvisoryCard
+│   ├── mandi/          # MandiPricesWidget, MarketComparisonModal
+│   └── admin/          # AdminLayout, AdminRoute
+├── context/            # AuthContext, LanguageContext, ToastContext
+├── hooks/              # useOnlineStatus
+├── services/           # api.ts, firebase.ts, voice/WebSpeechAdapter.ts, offlineStorage
+├── i18n/               # locales/ (en.json, mr.json)
+└── pages/              # Home, LandingPage, Dashboard, DiseasePage, DiseaseResultPage,
+                        # DiseaseHistoryPage, AdvisorPage, WeatherPage, MarketPage,
+                        # Farm, Profile, CropCalendarPage, Settings, ResourcesPage,
+                        # SavedAdvicePage, ForgotPassword, Login, Register,
+                        # admin/ (AdminOverviewPage, AdminUsersPage, AdminDiseasePage,
+                        #         AdminKnowledgePage, AdminFeedbackPage, AdminModelPage,
+                        #         AdminAnalyticsPage, AdminSettingsPage)
 ```
 
 ---
@@ -95,30 +105,46 @@ The backend follows a modular domain-driven layout with asynchronous endpoints a
 backend/
 ├── app/
 │   ├── api/
-│   │   ├── v1/
-│   │   │   ├── endpoints/
-│   │   │   │   ├── auth.py
-│   │   │   │   ├── profile.py
-│   │   │   │   ├── disease.py
-│   │   │   │   ├── advisor.py
-│   │   │   │   ├── weather.py
-│   │   │   │   ├── mandi.py
-│   │   │   │   ├── feedback.py
-│   │   │   │   └── admin.py
-│   │   │   └── router.py
+│   │   ├── health.py             # System health & dependency status probe
+│   │   └── v1/
+│   │       ├── endpoints/
+│   │       │   ├── auth.py           # Phone OTP request & verification
+│   │       │   ├── users.py          # Farmer profile management
+│   │       │   ├── farms.py          # Farm plot CRUD
+│   │       │   ├── crops.py          # Crop catalog management
+│   │       │   ├── disease.py        # Leaf image upload & ML disease diagnosis
+│   │       │   ├── chat.py           # RAG AI advisory chatbot
+│   │       │   ├── weather.py        # Live weather & spraying advisories
+│   │       │   ├── mandi.py          # APMC market commodity rates
+│   │       │   ├── feedback.py       # Diagnostic feedback collection
+│   │       │   ├── admin_knowledge.py# KB document ingestion
+│   │       │   ├── admin_system.py   # System metrics & model tuning
+│   │       │   └── voice.py          # Voice recognition helpers
+│   │       └── router.py
+│   ├── auth/
+│   │   ├── jwt.py                # JWT token decoding, user & admin role guards
+│   │   └── otp_service.py        # Dev/Production pluggable OTP service
 │   ├── core/
-│   │   ├── config.py         # BaseSettings & Environment variables
-│   │   ├── security.py       # JWT creation/verification & hashing
-│   │   └── database.py       # SQLAlchemy async session management
-│   ├── models/               # SQLAlchemy ORM Models
-│   ├── schemas/              # Pydantic Schemas for Validation
+│   │   ├── config.py             # Pydantic v2 BaseSettings & environment variables
+│   │   ├── logging_config.py     # Structured JSON/console logging
+│   │   └── security.py           # JWT token encoding & verification
+│   ├── database/
+│   │   ├── base.py               # SQLAlchemy declarative base
+│   │   ├── init_db.py            # Schema creation & initial database seeding
+│   │   └── session.py            # Database engine & sessionmaker
+│   ├── models/                   # SQLAlchemy ORM Models
+│   ├── schemas/                  # Pydantic v2 Schemas for Validation
 │   ├── services/
-│   │   ├── disease_service.py # OpenCV preprocessing & MobileNetV2 inference
-│   │   ├── rag_service.py     # ChromaDB query & Claude API completion
-│   │   ├── weather_service.py # OpenWeatherMap API wrapper with caching
-│   │   ├── mandi_service.py   # data.gov.in Agmarknet wrapper
-│   │   └── voice_service.py   # Speech STT/TTS adapter
-│   └── main.py               # FastAPI App initialization & Middleware
+│   │   ├── cache_service.py           # In-memory TTL cache with thread lock
+│   │   ├── disease_ml_service.py      # MobileNetV2 inference & Mock fallback adapter
+│   │   ├── document_ingestion.py      # PDF text extraction & sentence-aware chunking
+│   │   ├── image_validation_service.py# OpenCV foliage detection & blur check
+│   │   ├── intent_detector.py         # Marathi & English regex intent classifier
+│   │   ├── mandi_service.py           # data.gov.in integration with APMC fallbacks
+│   │   ├── rag_advisor.py             # RAG pipeline & Claude LLM grounded synthesis
+│   │   ├── vector_store.py            # ChromaDB client & sentence-transformers embeddings
+│   │   └── weather_service.py         # OpenWeatherMap API & agro-advisory rules
+│   └── main.py                   # FastAPI App initialization & Middleware
 ```
 
 ---
@@ -217,15 +243,19 @@ erDiagram
 | :--- | :--- | :--- | :--- |
 | `/api/v1/auth/request-otp` | `POST` | Request phone OTP | No |
 | `/api/v1/auth/verify-otp` | `POST` | Verify OTP & return JWT token | No |
-| `/api/v1/profile` | `GET/PUT` | Get/update farmer profile details | Yes |
+| `/api/v1/users` | `GET/PUT` | Get/update farmer profile details | Yes |
+| `/api/v1/farms` | `GET/POST/PUT/DELETE` | Farm plot CRUD | Yes |
+| `/api/v1/crops` | `GET/POST` | Crop catalog management | Yes |
 | `/api/v1/disease/predict` | `POST` | Upload photo & run OpenCV + MobileNetV2 inference | Yes |
 | `/api/v1/disease/history` | `GET` | Retrieve past scan results for farmer | Yes |
-| `/api/v1/advisor/query` | `POST` | Execute voice/text grounded RAG query via Claude API | Yes |
+| `/api/v1/chat/message` | `POST` | Execute voice/text grounded RAG query via Claude API | Yes |
 | `/api/v1/weather/current` | `GET` | Get location/district weather forecast & agromet advice | Yes |
 | `/api/v1/mandi/prices` | `GET` | Fetch commodity market prices filtered by district | Yes |
 | `/api/v1/feedback` | `POST` | Submit star rating / comment for scan or advice | Yes |
-| `/api/v1/admin/kb/sync` | `POST` | Ingest new KVK/ICAR PDF documents into ChromaDB | Admin |
-| `/api/v1/admin/metrics` | `GET` | Fetch platform usage, disease prevalence & feedback scores | Admin |
+| `/api/v1/voice` | `POST` | Voice recognition processing helpers | Yes |
+| `/api/v1/admin/knowledge` | `POST` | Ingest new KVK/ICAR PDF documents into ChromaDB | Admin |
+| `/api/v1/admin` | `GET` | Fetch platform usage, disease prevalence & feedback scores | Admin |
+| `/health` | `GET` | System dependency health probe | No |
 
 ---
 
@@ -329,15 +359,15 @@ graph TD
 ## 12. Folder Structure
 
 ```
-Agrisense/
+Agrisense 1/
 ├── docs/
 │   ├── architecture.md       # Full technical architecture (this file)
 │   ├── PRD.md                # Product Requirements Document
-│   └── development-plan.md   # Multi-phase execution roadmap
+│   ├── development-plan.md   # Multi-phase execution roadmap
+│   └── test-report.md        # QA test results matrix
 ├── frontend/                 # React + Vite + TypeScript PWA
-│   ├── public/               # Favicon, PWA manifest, icons
+│   ├── public/               # Favicon, PWA manifest (manifest.json), sw.js
 │   ├── src/
-│   │   ├── assets/
 │   │   ├── components/
 │   │   ├── context/
 │   │   ├── hooks/
@@ -354,18 +384,26 @@ Agrisense/
 ├── backend/                  # Python FastAPI application
 │   ├── app/
 │   │   ├── api/
+│   │   ├── auth/
 │   │   ├── core/
+│   │   ├── database/
 │   │   ├── models/
 │   │   ├── schemas/
 │   │   ├── services/
 │   │   └── main.py
-│   ├── data/                 # Vector DB data directory & model checkpoints
-│   │   ├── chromadb/
-│   │   └── models/
+│   ├── chroma_db/            # ChromaDB persistent vector index
+│   ├── static/scans/         # Uploaded leaf scan images
 │   ├── tests/
 │   ├── requirements.txt
 │   └── Dockerfile
-├── .env.example              # Environment variables template
+├── ml/
+│   ├── dataset/              # PlantVillage & field photos (place images here)
+│   ├── evaluation/           # Model accuracy evaluation scripts
+│   └── training/             # MobileNetV2 transfer learning pipeline
+├── chroma_db/                # Root-level ChromaDB (used when running from project root)
+├── static/scans/             # Root-level static scan storage
+├── .env                      # Active environment configuration
+├── .env.example              # Environment variables template (placeholders only)
 └── README.md
 ```
 
@@ -373,7 +411,7 @@ Agrisense/
 
 ## 13. Environment Variables Specification
 
-Refer to [.env.example](file:///c:/Users/yashs/OneDrive/Desktop/Agrisense/.env.example) for exact defaults and structure.
+Refer to [.env.example](./../.env.example) for exact defaults and structure.
 
 - `DATABASE_URL`: PostgreSQL connection string.
 - `ANTHROPIC_API_KEY`: Key for Claude API.
@@ -437,21 +475,14 @@ python-multipart>=0.0.9
 ## 15. Development Phases
 
 ```mermaid
-gantt
-    title AgriSense Multi-Phase Development Roadmap
-    dateFormat  YYYY-MM-DD
-    section Phase 0
-    Architecture & Analysis    :done, p0, 2026-09-01, 2026-09-07
-    section Phase 1
-    Core Setup & Schema        :p1, 2026-09-08, 2026-09-14
-    section Phase 2
-    ML Vision Engine           :p2, 2026-09-15, 2026-09-22
-    section Phase 3
-    KVK RAG & Voice Advisor    :p3, 2026-09-23, 2026-09-30
-    section Phase 4
-    Dashboards & PWA Offline   :p4, 2026-10-01, 2026-10-08
-    section Phase 5
-    Admin Portal & Hardening   :p5, 2026-10-09, 2026-10-15
+flowchart LR
+    p0["Phase 0\nArchitecture & Analysis\n(DONE)"] --> p1["Phase 1\nCore Setup & Schema\n(DONE)"]
+    p1 --> p2["Phase 2\nWeather & Mandi\n(DONE)"]
+    p2 --> p3["Phase 3\nML Vision Engine\n(DONE)"]
+    p3 --> p45["Phase 4 & 5\nRAG & Voice Advisory\n(DONE)"]
+    p45 --> p6["Phase 6\nHistory & Feedback\n(DONE)"]
+    p6 --> p7["Phase 7\nAdmin Portal\n(DONE)"]
+    p7 --> p8["Phase 8\nIntegration QA & Security\n(DONE)"]
 ```
 
 - **Phase 0**: Project Analysis, Technical Architecture, PRD, and Environment setup.

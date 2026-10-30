@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     OPENWEATHER_API_KEY: str = os.getenv("OPENWEATHER_API_KEY", "")
     DATA_GOV_IN_API_KEY: str = os.getenv("DATA_GOV_API_KEY") or os.getenv("DATA_GOV_IN_API_KEY", "")
     ANTHROPIC_API_KEY: str = os.getenv("CLAUDE_API_KEY") or os.getenv("ANTHROPIC_API_KEY", "")
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    GEMINI_MODEL_NAME: str = os.getenv("GEMINI_MODEL_NAME", "gemini-3.5-flash-lite")
     CACHE_TTL_MINUTES: int = int(os.getenv("CACHE_TTL_MINUTES", "30"))
     
     # RAG & ChromaDB Configuration

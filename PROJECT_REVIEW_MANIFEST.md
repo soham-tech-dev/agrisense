@@ -1,9 +1,9 @@
 # AgriSense — Project Review & Architecture Manifest
 
-**Date of Review**: October 13, 2026  
+**Date of Review**: October 28, 2026  
 **Project**: AgriSense — Vernacular AI Agentic Advisory Platform for Smallholder Farmers  
 **Package Name**: `AgriSense_Review_Package`  
-**Target Audience**: ChatGPT / Technical Code Reviewers / Solution Architects  
+**Target Audience**: Technical Code Reviewers / Solution Architects  
 
 ---
 
@@ -75,7 +75,7 @@ AgriSense_Review_Package/
 │   │       ├── vector_store.py        # ChromaDB client & sentence-transformers embeddings
 │   │       └── weather_service.py     # OpenWeatherMap API & agro-advisory rules
 │   ├── static/scans/                  # Sample leaf scan test images
-│   └── tests/                         # 10 Pytest test suites (47 test cases)
+│   └── tests/                         # 10 Pytest test suites (52 test cases)
 ├── frontend/
 │   ├── Dockerfile                     # Nginx alpine container for frontend SPA
 │   ├── index.html                     # HTML5 entry with PWA meta tags
@@ -112,7 +112,7 @@ AgriSense_Review_Package/
 │   ├── PRD.md                         # Product Requirements Document
 │   ├── architecture.md                # Full technical architecture specification
 │   ├── development-plan.md            # Phased delivery breakdown
-│   └── test-report.md                 # QA testing results matrix (47/47 passed)
+│   └── test-report.md                 # QA testing results matrix (52/52 passed)
 └── static/scans/                      # Sample crop disease photographs
 ```
 
@@ -127,7 +127,7 @@ AgriSense_Review_Package/
 | **Backend API Gateway** | Python 3.11, FastAPI, Pydantic v2, Uvicorn | Async ASGI server with OpenAPI documentation |
 | **Database & ORM** | PostgreSQL 15 / SQLite fallback, SQLAlchemy 2.0 | Multi-tenant schema with relational foreign keys |
 | **Vector Store & Embeddings** | ChromaDB 0.5+, `sentence-transformers` (`all-MiniLM-L6-v2`) | Persistent vector database using HNSW cosine index |
-| **LLM & RAG** | Anthropic Claude 3.5 Sonnet API | Context-grounded synthesis with safety fallback bounds |
+| **LLM & RAG** | Anthropic Claude 3.5 Sonnet API (`claude-3-5-sonnet-20241022`) | Context-grounded synthesis with safety fallback bounds |
 | **Computer Vision / ML** | OpenCV (`opencv-python-headless`), MobileNetV2, PIL | Foliage segmentation, blur gating, CNN classification |
 | **Voice / Speech** | Web Speech API (STT & TTS), pluggable adapter layer | Low-latency client-side browser speech recognition |
 | **Containerization** | Docker, Docker Compose, Nginx | Multi-stage Docker builds for production deployment |
@@ -163,10 +163,9 @@ AgriSense_Review_Package/
 - **API Base Route**: The frontend communicates via `/api/v1` (`frontend/src/services/api.ts`).
 - **Development Proxy**: Vite dev server proxies `/api` and `/health` requests to `http://localhost:8000`.
 - **Authentication Handshake**:
-  1. User enters phone number on `Login.tsx` -> calls `POST /api/v1/auth/request-otp`.
-  2. User enters OTP code -> calls `POST /api/v1/auth/verify-otp`.
-  3. Backend verifies code and returns `{ access_token, user }`.
-  4. Frontend stores JWT in `localStorage` under key `agrisense_token` and attaches `Authorization: Bearer <token>` to subsequent requests.
+  1. Frontend supports dual authentication: Firebase Authentication (Email/Password & Google Sign-In) via `AuthContext.tsx` and Phone OTP via `POST /api/v1/auth/request-otp` and `POST /api/v1/auth/verify-otp`.
+  2. Verified users receive JWT ID tokens (`access_token`) and user profile payloads.
+  3. Frontend stores JWT in `localStorage` under key `agrisense_token` and attaches `Authorization: Bearer <token>` to protected API requests.
 - **Image Upload Flow**:
   1. Leaf photo captured in `DiseasePage.tsx` via camera input.
   2. Submitted via `multipart/form-data` to `POST /api/v1/disease/predict`.
@@ -204,7 +203,7 @@ AgriSense_Review_Package/
    - Fetches APMC market commodity rates (Min, Max, Modal prices).
    - Caching: 30-minute in-memory caching.
    - Fallback: Comprehensive fallback price matrix for Maharashtra APMCs (Lasalgaon, Pimpalgaon, Nashik, Pune, Solapur).
-3. **Anthropic Claude API (`claude-3-5-sonnet-20240620`)**:
+3. **Anthropic Claude API (`claude-3-5-sonnet-20241022`)**:
    - Synthesizes farmer advice grounded in retrieved KVK text chunks.
    - Fallback: Resilient local grounded text synthesizer using top-ranked snippets if API key is absent.
 
@@ -310,7 +309,7 @@ APP_NAME=AgriSense
 VERSION=1.0.0
 ENVIRONMENT=development                       # 'development' or 'production'
 LOG_LEVEL=INFO
-CORS_ORIGINS=http://localhost:5173,http://localhost:8000
+CORS_ORIGINS=http://localhost:5173,http://localhost:8000,http://localhost:3000,http://127.0.0.1:3000
 
 # Security & Authentication
 JWT_SECRET=your_32_character_random_jwt_secret_here
@@ -388,8 +387,8 @@ cd frontend
 npm install
 npm run dev
 ```
-- Web Application: `http://localhost:5173`
-- Demo Farmer Login: Phone `9876543210`, OTP `123456`
+- Web Application: `http://localhost:3000`
+- Demo Farmer Login: Phone `9876543210`, OTP `123456` (or Firebase Email/Google login)
 - Admin Login: Phone `9999999999`, OTP `123456`
 
 ### Option B: Docker Compose Run
