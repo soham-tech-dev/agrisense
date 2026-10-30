@@ -72,7 +72,7 @@ class BaseDiseaseClassifier(ABC):
 class MobileNetV2Classifier(BaseDiseaseClassifier):
     # Paths are relative to the project root (one level above backend/)
     _BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-    MODEL_PATH = os.path.join(_BASE, "ml", "models", "mobilenetv2_crop_disease.h5")
+    MODEL_PATH = os.path.join(_BASE, "ml", "models", "mobilenetv2_crop_disease.keras")
     CLASS_MAP_PATH = os.path.join(_BASE, "ml", "models", "class_indices.json")
 
     def __init__(self, model_path: str = None):
