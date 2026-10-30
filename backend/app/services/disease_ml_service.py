@@ -294,45 +294,98 @@ class MockDiseaseClassifier(BaseDiseaseClassifier):
 class DiseaseMLService:
     def __init__(self, confidence_threshold: float = DEFAULT_CONFIDENCE_THRESHOLD):
         self.confidence_threshold = confidence_threshold
+        self.tier1_classifier = MobileNetV2Classifier()
+        self.tier2_classifier = GeminiVisionClassifier()
+        self.tier3_classifier = MockDiseaseClassifier()
         self._select_primary_classifier()
 
     def _select_primary_classifier(self):
-        local = MobileNetV2Classifier()
-        if local.is_available():
-            self.classifier = local
+        if self.tier1_classifier.is_available():
+            self.classifier = self.tier1_classifier
             self._tier = 1
             logger.info("[DiseaseMLService] Tier 1 active: Local MobileNetV2 CNN.")
             return
 
-        gemini = GeminiVisionClassifier()
-        if gemini.is_available():
-            self.classifier = gemini
+        if self.tier2_classifier.is_available():
+            self.classifier = self.tier2_classifier
             self._tier = 2
-            logger.info(f"[DiseaseMLService] Tier 2 active: Gemini Vision ({gemini.model_name}).")
+            logger.info(f"[DiseaseMLService] Tier 2 active: Gemini Vision ({self.tier2_classifier.model_name}).")
             return
 
-        self.classifier = MockDiseaseClassifier()
+        self.classifier = self.tier3_classifier
         self._tier = 3
         logger.warning("[DiseaseMLService] Tier 3 active: Mock heuristic fallback.")
 
     def set_confidence_threshold(self, threshold: float):
         self.confidence_threshold = threshold
 
-    def predict(self, img_bytes: bytes, img_bgr: Optional[np.ndarray] = None) -> Dict[str, Any]:
+    def predict(
+        self,
+        img_bytes: bytes,
+        img_bgr: Optional[np.ndarray] = None,
+        crop_hint: Optional[str] = None
+    ) -> Dict[str, Any]:
         if img_bgr is None:
             np_arr = np.frombuffer(img_bytes, np.uint8)
             img_bgr = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
-        try:
-            result = self.classifier.predict(img_bgr, image_bytes=img_bytes)
-        except RuntimeError as tier_err:
-            if self._tier == 2:
+        result = None
+        active_tier = self._tier
+
+        # Step 1: Run Primary Classifier (Tier 1 Local CNN if available)
+        if self._tier == 1:
+            try:
+                result = self.tier1_classifier.predict(img_bgr, image_bytes=img_bytes)
+                result["tier"] = 1
+            except Exception as e:
+                logger.warning(f"[DiseaseMLService] Tier 1 prediction failed: {e}. Attempting Tier 2.")
+                result = None
+
+            # Step 2: Intelligent Hybrid Escalation Check
+            # If Tier 1 confidence is below 0.70 (uncertain/cross-crop domain shift)
+            # or if an explicit crop_hint contradicts the prediction,
+            # escalate to Tier 2 (Gemini Vision) if available!
+            should_escalate = False
+            if result is None:
+                should_escalate = True
+            elif result.get("confidence", 0) < 0.70:
+                should_escalate = True
+            elif crop_hint and crop_hint.lower() not in result.get("prediction", "").lower():
+                should_escalate = True
+
+            if should_escalate and self.tier2_classifier.is_available():
+                try:
+                    logger.info(
+                        f"[DiseaseMLService] Escalating to Tier 2 (Gemini Vision) "
+                        f"(Tier 1 conf: {result.get('confidence', 0) if result else 'N/A'}, crop_hint: {crop_hint})"
+                    )
+                    t2_res = self.tier2_classifier.predict(img_bgr, image_bytes=img_bytes)
+                    # If Gemini returned equal or better confidence, adopt it
+                    if t2_res and t2_res.get("confidence", 0) >= (result.get("confidence", 0) if result else 0.40):
+                        t2_res["tier"] = 2
+                        t2_res["escalated_from_tier1"] = True
+                        result = t2_res
+                        active_tier = 2
+                except Exception as gemini_err:
+                    logger.warning(f"[DiseaseMLService] Tier 2 escalation failed: {gemini_err}. Retaining Tier 1.")
+
+        # Step 3: Direct Tier 2 if Tier 1 was not available
+        elif self._tier == 2:
+            try:
+                result = self.tier2_classifier.predict(img_bgr, image_bytes=img_bytes)
+                result["tier"] = 2
+            except RuntimeError as tier_err:
                 logger.warning(f"[DiseaseMLService] Gemini Vision failed: {tier_err}. Dropping to Tier 3 fallback.")
-                fallback = MockDiseaseClassifier()
-                result = fallback.predict(img_bgr, image_bytes=img_bytes)
+                result = self.tier3_classifier.predict(img_bgr, image_bytes=img_bytes)
+                result["tier"] = 3
                 result["warning_note"] = "AI vision service busy. Result is an estimate."
-            else:
-                raise
+                active_tier = 3
+
+        # Step 4: Tier 3 fallback if nothing else succeeded
+        if result is None:
+            result = self.tier3_classifier.predict(img_bgr, image_bytes=img_bytes)
+            result["tier"] = 3
+            active_tier = 3
 
         prediction = result["prediction"]
         confidence = float(result["confidence"])
@@ -349,6 +402,6 @@ class DiseaseMLService:
             "is_low_confidence": is_low_confidence,
             "warning": warning,
             "threshold": self.confidence_threshold,
-            "tier": self._tier,
+            "tier": active_tier,
             "gemini_detail": gemini_detail
         }
